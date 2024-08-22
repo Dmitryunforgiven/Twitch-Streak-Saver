@@ -61,7 +61,11 @@ def close_browser():
 
 def claim_reward(driver):
     logging.debug('Trying to find and press the button')
-    button_xpath = '//*[@id="live-page-chat"]/div/div/div[2]/div/div/section/div/div[6]/div[2]/div[2]/div[1]/div/div/div/div[2]/div/div/div/button'
+    
+    if config.extension == True:
+        button_xpath = '//*[@id="live-page-chat"]/div/div/div[2]/div/div/section/div/seventv-container/div/div[2]/div[2]/div[1]/div/div/div[1]/div[2]/div/div/div/button'
+    else:
+        button_xpath = '//*[@id="live-page-chat"]/div/div/div[2]/div/div/section/div/div[6]/div[2]/div[2]/div[1]/div/div/div/div[2]/div/div/div/button'
     
     while True:
         try:

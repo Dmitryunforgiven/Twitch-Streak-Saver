@@ -35,3 +35,8 @@ delay = 300
 mute = False
 maximize = False
 minimize = False
+
+
+#is 7tv extension installed in your chrome profile
+#(button xpath changes depending on this)
+extension = True
