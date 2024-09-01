@@ -75,8 +75,8 @@ Ensure that the `config.py` file is correctly set up with the following paramete
 - `chrome_profile_name`: Name of your Chrome profile.
 - `chromedriver_path`: Path to your ChromeDriver executable.
 - `mute`: Mutes the opened window.
-- `maximize`: maximizes the opened window.
-- `minimize`: minimizes the opened window.
+- `maximize`: Maximizes the opened window.
+- `minimize`: Minimizes the opened window.
 
 ## Troubleshooting
 
