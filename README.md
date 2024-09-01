@@ -4,6 +4,7 @@ TTV Streak Saver is a tool that uses Selenium WebDriver and the Twitch Helix API
 
 ## Requirements
 
+- Severe autism
 - A registered app on [Twitch Developer](https://dev.twitch.tv/)
 - For initial setup, manually open the `implicit_grant_link` from the config file to connect your app to your twitch account
 - A config file populated with your data
