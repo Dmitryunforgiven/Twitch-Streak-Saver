@@ -57,7 +57,7 @@ To ensure that Selenium WebDriver can connect to Chrome, you need to modify the 
 1. Activate your Python virtual environment.
 2. Install the required packages listed in `requirements.txt`.
 3. Run the `main.py` script directly using Python.
-4. Or run the included `streak.bat` file
+4. Or run the included `streak.bat` file.
 
 ## Monitor Logs
 
