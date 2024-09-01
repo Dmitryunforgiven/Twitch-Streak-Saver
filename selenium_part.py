@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import socket
+from selenium.webdriver.common.keys import Keys
 
 logging.basicConfig(level=config.logging_level, filename='log.log', filemode='w',
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -41,9 +42,10 @@ def refresh_user_token():
     
     if is_port_in_use(9222):
         driver = create_driver(detach=False)
-        driver.execute_script("window.open('', '_blank');")
-        driver.switch_to.window(driver.window_handles[-1])
-        
+        driver.find_element('tag name', 'body').send_keys(Keys.CONTROL + 'n')
+        driver.execute_script("window.open('');")
+        new_window = driver.window_handles[-1]
+        driver.switch_to.window(new_window)
     else:
         driver = create_driver(detach=True)
 
@@ -58,8 +60,10 @@ def open_twitch():
 
     if is_port_in_use(9222):
         driver = create_driver(detach=False)
+        driver.find_element('tag name', 'body').send_keys(Keys.CONTROL + 'n')
         driver.execute_script("window.open('');")
         driver.switch_to.window(driver.window_handles[-1])
+        print(driver.window_handles)
     else:
         driver = create_driver(detach=True)
 
