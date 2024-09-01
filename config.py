@@ -32,6 +32,7 @@ delay = 300
 
 
 # Opened window settings
+# Mute works only if there were no windows opened by a user
 mute = False
 maximize = False
 minimize = False
