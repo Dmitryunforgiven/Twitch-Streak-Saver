@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import socket
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
 
 logging.basicConfig(level=config.logging_level, filename='log.log', filemode='w',
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -30,9 +31,6 @@ def create_driver(detach=False):
         options.add_experimental_option('detach', True)
     else:
         options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-        
-    if config.mute:
-        options.add_argument("--mute-audio")
 
     service = Service(executable_path=config.chromedriver_path)
     return webdriver.Chrome(service=service, options=options)
@@ -48,7 +46,7 @@ def refresh_user_token():
         driver.switch_to.window(new_window)
     else:
         driver = create_driver(detach=True)
-
+        
     initial_handles = driver.window_handles
     driver.get(config.implicit_grant_link)
     refreshed_token = driver.current_url[32:62]
@@ -68,6 +66,11 @@ def open_twitch():
 
     initial_handles = driver.window_handles
     driver.get(f'https://www.twitch.tv/{config.channel_name}')
+
+    if config.mute:  #doesn't actually mute an opened tab, just decreases the twitch stream's volume to 0
+        actions = ActionChains(driver) 
+        actions.send_keys("m")
+        actions.perform()
 
     if config.minimize:
         time.sleep(5)
