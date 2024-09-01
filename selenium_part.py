@@ -40,7 +40,6 @@ def create_driver(detach=False):
 def refresh_user_token():
     global refreshed_token, driver, initial_handles
     
-    print(initial_handles)
     if is_port_in_use(9222):
         driver = create_driver(detach=False)
         driver.find_element('tag name', 'body').send_keys(Keys.CONTROL + 'n')
@@ -64,7 +63,6 @@ def open_twitch():
         driver.find_element('tag name', 'body').send_keys(Keys.CONTROL + 'n')
         driver.execute_script("window.open('');")
         driver.switch_to.window(driver.window_handles[-1])
-        print(driver.window_handles)
     else:
         driver = create_driver(detach=True)
 
