@@ -35,3 +35,7 @@ delay = 300
 mute = False
 maximize = False
 minimize = False
+
+
+#Use either INFO or DEBUG
+logging_level = 'INFO'

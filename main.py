@@ -9,7 +9,7 @@ import config
 clientId = config.client_id
 userId = config.userId
 
-logging.basicConfig(level=logging.INFO, filename='log.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=config.logging_level, filename='log.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_followed_list():
     global headers, data, counter, previous_channels, oAuth
