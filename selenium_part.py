@@ -63,7 +63,6 @@ def open_twitch():
         driver.find_element('tag name', 'body').send_keys(Keys.CONTROL + 'n')
         driver.execute_script("window.open('');")
         driver.switch_to.window(driver.window_handles[-1])
-        print(driver.window_handles)
     else:
         driver = create_driver(detach=True)
 
