@@ -15,7 +15,9 @@ from selenium.webdriver.common.action_chains import ActionChains
 logging.basicConfig(level=config.logging_level, filename='log.log', filemode='w',
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-initial_handles = []
+
+browser_closed = False
+
 
 def is_port_in_use(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -36,7 +38,7 @@ def create_driver(detach=False):
     return webdriver.Chrome(service=service, options=options)
 
 def refresh_user_token():
-    global refreshed_token, driver, initial_handles
+    global refreshed_token, driver
     
     if is_port_in_use(9222):
         driver = create_driver(detach=False)
@@ -47,14 +49,13 @@ def refresh_user_token():
     else:
         driver = create_driver(detach=True)
         
-    initial_handles = driver.window_handles
     driver.get(config.implicit_grant_link)
     refreshed_token = driver.current_url[32:62]
     driver.close()
     return refreshed_token
 
 def open_twitch():
-    global driver, initial_handles
+    global driver
 
     if is_port_in_use(9222):
         driver = create_driver(detach=False)
@@ -64,10 +65,9 @@ def open_twitch():
     else:
         driver = create_driver(detach=True)
 
-    initial_handles = driver.window_handles
     driver.get(f'https://www.twitch.tv/{config.channel_name}')
 
-    if config.mute:  #doesn't actually mute an opened tab, just decreases the twitch stream's volume to 0
+    if config.mute:
         actions = ActionChains(driver) 
         actions.send_keys("m")
         actions.perform()
@@ -82,34 +82,40 @@ def open_twitch():
     reward_thread.start()
 
 def close_browser():
-    global driver, initial_handles
-    if driver is not None:
-        try:
-            current_handles = driver.window_handles
-            if len(current_handles) > 1:
-                for handle in current_handles:
-                    driver.switch_to.window(handle)
-                    if handle not in initial_handles:
-                        driver.close()
-                
-                if initial_handles:
-                    driver.switch_to.window(initial_handles[0])
-            
-            if len(driver.window_handles) == 1:
+    global driver, browser_closed
+    
+    try:
+        found_twitch_tab = False
+        for handle in driver.window_handles:
+            driver.switch_to.window(handle)
+            if f'https://twitch.tv/{config.channel_name}' in driver.current_url:
+                driver.close()
+                found_twitch_tab = True
+                break
+
+        if found_twitch_tab:
+            if len(driver.window_handles) == 0:
                 driver.quit()
-            
-        except Exception as e:
-            logging.exception(f"Error occurred while closing the browser: {e}")
-        finally:
-            driver = None
-            logging.info("Browser closed successfully")
+                logging.info("Twitch tab closed. No other tabs open. Browser closed.")
+            else:
+                logging.info("Twitch tab closed. Other tabs still open.")
+            browser_closed = True
+        else:
+            logging.info("Twitch tab was not found or already closed by the user.")
+
+    except Exception as e:
+        logging.exception(f"Error occurred while closing the Twitch tab: {e}")
+    finally:
+        driver = None
+
 
 def claim_reward(driver):
     logging.debug('Trying to find and press the button')
-
+    global error_is_thrown
     xpaths = {
         "7tv_xpath": '//*[@id="live-page-chat"]/div/div/div[2]/div/div/section/div/seventv-container/div/div[2]/div[2]/div[1]/div/div/div[1]/div[2]/div/div/div/button',
-        "no7tv_xpath": '//*[@id="live-page-chat"]/div/div/div[2]/div/div/section/div/div[6]/div[2]/div[2]/div[1]/div/div/div/div[2]/div/div/div/button'
+        "no7tv_xpath": '//*[@id="live-page-chat"]/div/div/div[2]/div/div/section/div/div[6]/div[2]/div[2]/div[1]/div/div/div/div[2]/div/div/div/button',
+        "error_button": '//*[@id="root"]/div/div[1]/div/main/div[1]/div[3]/div/div/div[2]/div/div[2]/div/div[3]/div/div/div[5]/div/div[3]/button'
     }
 
     while True:
@@ -119,11 +125,16 @@ def claim_reward(driver):
                 button = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, xpath))
                 )
-                if button.is_enabled() and button.is_displayed():
+                if button.is_enabled() and button.is_displayed() and key != 'error_button':
                     button.click()
                     logging.info(f"Claimed reward using {key}")
                     print(f"Claimed reward using {key}")
                     return
+                elif button.is_enabled() and button.is_displayed() and key == 'error_button':
+                    error_is_thrown = True
+                    logging.info("Error button found, triggering error handling.")
+                    print("Error button found, triggering error handling.")
+                    return error_is_thrown
                 else:
                     logging.info(f"The button was found using {key}, but it's inactive")
 

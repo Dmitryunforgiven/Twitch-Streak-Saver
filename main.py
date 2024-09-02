@@ -5,7 +5,7 @@ import threading
 import selenium_part
 from selenium_part import refresh_user_token, close_browser
 import config
-
+from selenium_part import browser_closed
 clientId = config.client_id
 userId = config.userId
 
@@ -37,7 +37,6 @@ def get_followed_list():
         get_followed_list()
         return
 
-    # Validate token
     z = {
         'Authorization': f'OAuth {oAuth}'
     }
@@ -84,6 +83,7 @@ def get_followed_list():
 
 def check_selected_channels_status():
     global counter, even_iter_status, uneven_iter_status, previous_channels
+    error_is_thrown = False
 
     while True:
         try:
@@ -98,9 +98,9 @@ def check_selected_channels_status():
 
             if counter > 1:
                 if counter % 2 == 0:
-                    compare_statuses(even_iter_status, previous_channels)
+                    compare_statuses(even_iter_status, previous_channels, error_is_thrown)
                 else:
-                    compare_statuses(uneven_iter_status, previous_channels)
+                    compare_statuses(uneven_iter_status, previous_channels, error_is_thrown)
 
             previous_channels = {stream['user_name']: stream['type'] for stream in updated_data['data']}
 
@@ -110,9 +110,9 @@ def check_selected_channels_status():
             logging.error(f"Error fetching stream data: {e}. Retrying...")
             time.sleep(config.delay)
 
-def compare_statuses(current_status, previous_status):
-    global counter
-    current_channel_status = None
+def compare_statuses(current_status, previous_status, error_is_thrown):
+    global current_channel_status
+
     previous_channel_status = previous_status.get(config.channel_name, 'offline')
 
     for stream in current_status['data']:
@@ -121,6 +121,11 @@ def compare_statuses(current_status, previous_status):
             break
     else:
         current_channel_status = 'offline'
+        
+    if error_is_thrown:
+        previous_channel_status = 'live'
+        current_channel_status  = 'offline'
+        error_is_thrown = False
 
     if previous_channel_status == 'offline' and current_channel_status == 'live':
         print(f"{config.channel_name} is now online. Opening Twitch.")
@@ -128,13 +133,15 @@ def compare_statuses(current_status, previous_status):
         selenium_part.open_twitch()
 
     elif previous_channel_status == 'live' and current_channel_status == 'offline':
-        print(f"{config.channel_name} went offline. Closing browser.")
-        logging.info(f"{config.channel_name} went offline. Closing browser.")
-        selenium_part.close_browser()
+        if not selenium_part.browser_closed:
+            print(f"{config.channel_name} went offline. Closing browser.")
+            logging.info(f"{config.channel_name} went offline. Closing browser.")
+            selenium_part.close_browser()
 
     print(f"{config.channel_name} status change from {previous_channel_status} to {current_channel_status}")
     logging.info(f"{config.channel_name} status change from {previous_channel_status} to {current_channel_status}")
     previous_status[config.channel_name] = current_channel_status
+
 
 if __name__ == '__main__':
     even_iter_status = None
