@@ -5,7 +5,6 @@ import threading
 import selenium_part
 from selenium_part import refresh_user_token, close_browser
 import config
-from selenium_part import browser_closed
 clientId = config.client_id
 userId = config.userId
 
@@ -133,10 +132,9 @@ def compare_statuses(current_status, previous_status, error_is_thrown):
         selenium_part.open_twitch()
 
     elif previous_channel_status == 'live' and current_channel_status == 'offline':
-        if not selenium_part.browser_closed:
-            print(f"{config.channel_name} went offline. Closing browser.")
-            logging.info(f"{config.channel_name} went offline. Closing browser.")
-            selenium_part.close_browser()
+        print(f"{config.channel_name} went offline. Closing browser.")
+        logging.info(f"{config.channel_name} went offline. Closing browser.")
+        selenium_part.close_browser()
 
     print(f"{config.channel_name} status change from {previous_channel_status} to {current_channel_status}")
     logging.info(f"{config.channel_name} status change from {previous_channel_status} to {current_channel_status}")

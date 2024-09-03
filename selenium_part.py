@@ -82,26 +82,17 @@ def open_twitch():
     reward_thread.start()
 
 def close_browser():
-    global driver, browser_closed
+    global driver
     
     try:
-        found_twitch_tab = False
-        for handle in driver.window_handles:
-            driver.switch_to.window(handle)
-            if f'https://twitch.tv/{config.channel_name}' in driver.current_url:
-                driver.close()
-                found_twitch_tab = True
-                break
-
-        if found_twitch_tab:
-            if len(driver.window_handles) == 0:
-                driver.quit()
-                logging.info("Twitch tab closed. No other tabs open. Browser closed.")
-            else:
-                logging.info("Twitch tab closed. Other tabs still open.")
-            browser_closed = True
+        print(len(driver.window_handles))
+        logging.info(f"Number of opened tabs = {len(driver.window_handles)}")
+        if len(driver.window_handles) > 1:
+            driver.close()
+            logging.info("Twitch tab closed. Other tabs still open.")
         else:
-            logging.info("Twitch tab was not found or already closed by the user.")
+            driver.quit()
+            logging.info("Twitch tab closed. No other tabs open. Browser closed.")
 
     except Exception as e:
         logging.exception(f"Error occurred while closing the Twitch tab: {e}")
