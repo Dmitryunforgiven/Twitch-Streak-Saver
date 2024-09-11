@@ -102,7 +102,7 @@ def close_browser():
 
 def claim_reward(driver):
     logging.debug('Trying to find and press the button')
-    global error_is_thrown
+    
     xpaths = {
         "7tv_xpath": '//*[@id="live-page-chat"]/div/div/div[2]/div/div/section/div/seventv-container/div/div[2]/div[2]/div[1]/div/div/div[1]/div[2]/div/div/div/button',
         "no7tv_xpath": '//*[@id="live-page-chat"]/div/div/div[2]/div/div/section/div/div[6]/div[2]/div[2]/div[1]/div/div/div/div[2]/div/div/div/button',
@@ -122,10 +122,9 @@ def claim_reward(driver):
                     print(f"Claimed reward using {key}")
                     return
                 elif button.is_enabled() and button.is_displayed() and key == 'error_button':
-                    error_is_thrown = True
+                    button.click()
                     logging.info("Error button found, triggering error handling.")
                     print("Error button found, triggering error handling.")
-                    return error_is_thrown
                 else:
                     logging.info(f"The button was found using {key}, but it's inactive")
 

@@ -1,10 +1,10 @@
 1 - fix close_browser() function in case the stream ends and there are still some tabs opened by a user.
     (curently it cannot properly identify the page it opened to close it, throws an error in logs:
-    selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed         // SEEMS TO BE WORKING
+    selenium.common.exceptions.NoSuchWindowException: Message: no such window: target window already closed         // NEED TO TEST
     from unknown error: web view not found
     )
 
-2 - add handler for a stream error which requires to press the button or reload the page.                           // SEEMS TO BE WORKING
+2 - add handler for a stream error which requires to press the button or reload the page.                           // NEED TO TEST
 3 - add an apiless mode that is going to check the stream status using selenium and chrome in headless mode.
 4 - add a simple ui that would allow to select the needed channel to monitor from the list of followed channels.
 5 - add support for muli channel monitoring / points farming.

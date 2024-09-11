@@ -81,8 +81,7 @@ def get_followed_list():
     status_thread.join()
 
 def check_selected_channels_status():
-    global counter, even_iter_status, uneven_iter_status, previous_channels
-    error_is_thrown = False
+    global counter, even_iter_status, uneven_iter_status, previous_channels, error_is_thrown
 
     while True:
         try:
@@ -97,10 +96,11 @@ def check_selected_channels_status():
 
             if counter > 1:
                 if counter % 2 == 0:
-                    compare_statuses(even_iter_status, previous_channels, error_is_thrown)
+                    compare_statuses(even_iter_status, previous_channels)
                 else:
-                    compare_statuses(uneven_iter_status, previous_channels, error_is_thrown)
-
+                    compare_statuses(uneven_iter_status, previous_channels)
+                    
+            
             previous_channels = {stream['user_name']: stream['type'] for stream in updated_data['data']}
 
             time.sleep(config.delay)
@@ -109,7 +109,7 @@ def check_selected_channels_status():
             logging.error(f"Error fetching stream data: {e}. Retrying...")
             time.sleep(config.delay)
 
-def compare_statuses(current_status, previous_status, error_is_thrown):
+def compare_statuses(current_status, previous_status):
     global current_channel_status
 
     previous_channel_status = previous_status.get(config.channel_name, 'offline')
@@ -120,11 +120,6 @@ def compare_statuses(current_status, previous_status, error_is_thrown):
             break
     else:
         current_channel_status = 'offline'
-        
-    if error_is_thrown:
-        previous_channel_status = 'live'
-        current_channel_status  = 'offline'
-        error_is_thrown = False
 
     if previous_channel_status == 'offline' and current_channel_status == 'live':
         print(f"{config.channel_name} is now online. Opening Twitch.")
@@ -144,7 +139,7 @@ def compare_statuses(current_status, previous_status, error_is_thrown):
 if __name__ == '__main__':
     even_iter_status = None
     uneven_iter_status = None
-
+    error_is_thrown = False
     get_followed_list()
 
     while True:
