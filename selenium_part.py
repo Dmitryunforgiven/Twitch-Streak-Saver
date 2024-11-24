@@ -11,6 +11,7 @@ from selenium.common.exceptions import TimeoutException
 import socket
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import NoSuchElementException
 
 logging.basicConfig(level=config.logging_level, filename='log.log', filemode='w',
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -28,7 +29,7 @@ def create_driver(detach=False):
     options = webdriver.ChromeOptions()
     options.add_argument(f'--user-data-dir={config.path_to_your_chrome_profile_config}')
     options.add_argument(f'--profile-directory={config.chrome_profile_name}')
-    
+       
     if detach:
         options.add_experimental_option('detach', True)
     else:
@@ -71,9 +72,28 @@ def open_twitch():
         actions = ActionChains(driver) 
         actions.send_keys("m")
         actions.perform()
+        
+    time.sleep(3)
+    
+    try:
+        chat_element = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, '[aria-labelledby="chat-room-header-label"]'))
+        )
+        if not chat_element.is_displayed():
+            logging.info("Chat element is present but not visible.")
+            actions = ActionChains(driver)
+            actions.key_down(Keys.ALT).send_keys('r').perform()
+            logging.info("Alt + R pressed to open chat.")
+            print("Alt + R pressed to open chat.")
+    except Exception as e:
+        logging.exception(f"Error locating chat element: {e}")
+        print(f"Error locating chat element: {e}")
+    else:
+        logging.info("Chat element is visible and accessible.")
+        print("Chat element is visible.")
+        
 
     if config.minimize:
-        time.sleep(5)
         driver.minimize_window()
     if config.maximize:
         driver.maximize_window()
