@@ -1,4 +1,4 @@
-# No longer works with the latest chrome versions (29.05.2025 update, 136. versions)
+# No longer works with the latest chrome versions (29.04.2025 update, 136. versions)
 ```
 https://developer.chrome.com/blog/remote-debugging-port
 ```
