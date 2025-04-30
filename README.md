@@ -1,3 +1,9 @@
+# No longer works with the latest chrome versions (29.05.2025 update, 136. versions)
+```
+https://developer.chrome.com/blog/remote-debugging-port
+```
+
+
 # TTV Streak Saver
 
 TTV Streak Saver is a tool that uses Selenium WebDriver and the Twitch Helix API to maintain your view streak on a Twitch channel when you're not at home. It monitors the status of a selected Twitch channel and automatically opens a Chrome window with specified settings from the configuration file when the channel goes live. The tool collects points and streak rewards by clicking the relevant button. The window will close, and the tool will resume monitoring when the channel goes offline, reconnecting if the stream goes live again.
