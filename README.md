@@ -3,6 +3,8 @@
 https://developer.chrome.com/blog/remote-debugging-port
 ```
 
+# Try my other solution instead, which is faster, more reliable, configurable and similarly easy to setup
+```https://github.com/Dmitryunforgiven/Twitch-Points-Collector```
 
 # TTV Streak Saver
 
